@@ -24,6 +24,8 @@ contract EthSwap {
     function buyTokens() public payable {
         // Token amount equals the value of ethers sent in DApp Tokens
         uint tokenAmount = msg.value * rate; // msg.value equals the amount of ether sent when this function is called
+
+        require(token.balanceOf(address(this)) >= tokenAmount, "Balance less than requested tokens");
         token.transfer(msg.sender, tokenAmount); // msg.sender is the caller of this function
 
         // Emit TokenPurchased event
