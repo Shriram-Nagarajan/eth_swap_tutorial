@@ -8,7 +8,14 @@ contract EthSwap {
     
     string public name = "EthSwap Instant Exchange"; // state variable (stored on the blockchain)
     Token public token; // state variable
-    uint public rate = 100;
+    uint public rate = 100; // 1 ether = 100 DApp tokens
+
+    event TokenPurchased(
+        address account,
+        address token,
+        uint amount,
+        uint rate
+    );
 
     constructor(Token _token) public {
         token = _token; // _token is a local variable
@@ -18,6 +25,9 @@ contract EthSwap {
         // Token amount equals the value of ethers sent in DApp Tokens
         uint tokenAmount = msg.value * rate; // msg.value equals the amount of ether sent when this function is called
         token.transfer(msg.sender, tokenAmount); // msg.sender is the caller of this function
+
+        // Emit TokenPurchased event
+        emit TokenPurchased(msg.sender, address(token), tokenAmount, rate);
     }
 
 }

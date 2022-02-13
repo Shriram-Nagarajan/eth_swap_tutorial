@@ -39,8 +39,31 @@ contract('EthSwap', ([deployer, investor]) => {
     })
 
     describe('buyTokens() method', async() => {
+
+        let result;
+
+        before(async() => {
+            // the investor swaps their 1 ether to get 100 DApp tokens
+            result = await ethSwap.buyTokens({from: investor, value: web3.utils.toWei('1')});
+        });
         it('purchase tokens for fixed price', async() => {
-            await ethSwap.buyTokens({from: investor, value: web3.utils.toWei('1')});
+            let investorBalance = await token.balanceOf(investor);
+            // Check if DApp tokens are added to investor account
+            assert.equal(investorBalance.toString(), tokens('100'));
+
+            // check ethSwap's token balance, should be debited by 100 DApp tokens (= 1 Ether)
+            let ethSwapBalance = await token.balanceOf(ethSwap.address);
+            assert.equal(ethSwapBalance.toString(), tokens('999900'));
+
+            // check ethSwap's ether balance, should be credited by 1 Ether
+            ethSwapBalance = await web3.eth.getBalance(ethSwap.address);
+            assert.equal(ethSwapBalance.toString(), web3.utils.toWei('1', 'Ether'));
+
+            const event = result.logs[0].args;
+            assert.equal(event.account, investor);
+            assert.equal(event.token, token.address);
+            assert.equal(event.amount, tokens('100').toString());
+            assert.equal(event.rate.toString(), '100');
         });
     })
 
