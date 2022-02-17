@@ -46,6 +46,7 @@ contract('EthSwap', ([deployer, investor]) => {
             // the investor swaps their 1 ether to get 100 DApp tokens
             result = await ethSwap.buyTokens({from: investor, value: web3.utils.toWei('1')});
         });
+        
         it('purchase tokens for fixed price', async() => {
             let investorBalance = await token.balanceOf(investor);
             // Check if DApp tokens are added to investor account
@@ -77,7 +78,7 @@ contract('EthSwap', ([deployer, investor]) => {
             // the investor swaps their tokens to get ether
             result = await ethSwap.sellTokens(tokens('100'), {from: investor}); 
         });
-        
+
         it('sell tokens to ethSwap for fixed price', async() => {
             let investorBalance = await token.balanceOf(investor);
             // Check if DApp tokens are sold from investor account
