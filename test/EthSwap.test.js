@@ -67,4 +67,37 @@ contract('EthSwap', ([deployer, investor]) => {
         });
     })
 
+    describe('sellTokens() method', async() => {
+
+        let result;
+
+        before(async() => {
+            // the investor must approve the tokens to be swapped first
+            await token.approve(ethSwap.address, tokens('100'), {from: investor});
+            // the investor swaps their tokens to get ether
+            result = await ethSwap.sellTokens(tokens('100'), {from: investor}); 
+        });
+        it('sell tokens to ethSwap for fixed price', async() => {
+            let investorBalance = await token.balanceOf(investor);
+            // Check if DApp tokens are sold from investor account
+            assert.equal(investorBalance.toString(), tokens('0'));
+            // check ethSwap's token balance, should be credited by 100 DApp tokens (= 1 Ether)
+            let ethSwapBalance = await token.balanceOf(ethSwap.address);
+            assert.equal(ethSwapBalance.toString(), tokens('1000000'));
+
+            // check ethSwap's ether balance, should be credited by 1 Ether
+            ethSwapBalance = await web3.eth.getBalance(ethSwap.address);
+            assert.equal(ethSwapBalance.toString(), web3.utils.toWei('0', 'Ether'));
+
+            const event = result.logs[0].args;
+            assert.equal(event.account, investor);
+            assert.equal(event.token, token.address);
+            assert.equal(event.amount, tokens('100').toString());
+            assert.equal(event.rate.toString(), '100');
+
+            // FAILURE: investor can't sell more tokens than they have
+            await ethSwap.sellTokens('500', {from: investor}).should.be.rejected;
+        });
+    })
+
 });
