@@ -77,6 +77,7 @@ contract('EthSwap', ([deployer, investor]) => {
             // the investor swaps their tokens to get ether
             result = await ethSwap.sellTokens(tokens('100'), {from: investor}); 
         });
+        
         it('sell tokens to ethSwap for fixed price', async() => {
             let investorBalance = await token.balanceOf(investor);
             // Check if DApp tokens are sold from investor account
