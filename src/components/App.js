@@ -1,8 +1,64 @@
 import React, { Component } from 'react';
+import Web3 from 'web3';
 import logo from '../logo.png';
 import './App.css';
 
 class App extends Component {
+
+  async componentWillMount() {
+    await this.loadWeb3();
+    await this.loadBlockChainData();
+  }
+
+  async loadBlockChainData() {
+    const ethereum = window.ethereum;
+    const web3 = window.w3;
+    const accounts = await ethereum.request({ method: 'eth_accounts' });
+    // const accounts = await web3.eth.getAccounts();
+    // web3.eth.defaultAccount = accounts[1];
+    this.setState({
+      account: accounts[0]
+    });
+    const ethBalance = await web3.eth.getBalance(this.state.account);
+    console.log(ethBalance);
+    // this.setState({ ethBalance });
+  }
+
+  async loadWeb3() {
+    window.addEventListener('load', async () => {
+      // Modern dapp browsers...
+      if (window.ethereum) {
+          window.w3 = new Web3(window.ethereum);
+          try {
+              // Request account access if needed
+              await window.ethereum.enable();
+              // Acccounts now exposed
+              window.w3.eth.sendTransaction({/* ... */});
+          } catch (error) {
+              // User denied account access...
+          }
+      }
+      // Legacy dapp browsers...
+      else if (window.w3) {
+          window.w3 = new Web3(window.w3.currentProvider);
+          // Acccounts always exposed
+          window.w3.eth.sendTransaction({/* ... */});
+      }
+      // Non-dapp browsers...
+      else {
+          console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
+      }
+    });
+  }
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      account: '',
+      ethBalance: 0
+    }
+  }
+
   render() {
     return (
       <div>
@@ -27,18 +83,7 @@ class App extends Component {
                 >
                   <img src={logo} className="App-logo" alt="logo" />
                 </a>
-                <h1>Dapp University Starter Kit</h1>
-                <p>
-                  Edit <code>src/components/App.js</code> and save to reload.
-                </p>
-                <a
-                  className="App-link"
-                  href="http://www.dappuniversity.com/bootcamp"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  LEARN BLOCKCHAIN <u><b>NOW! </b></u>
-                </a>
+                <h1> Hello World </h1>
               </div>
             </main>
           </div>
