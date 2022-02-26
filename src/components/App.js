@@ -7,24 +7,22 @@ class App extends Component {
 
   async componentWillMount() {
     await this.loadWeb3();
-    await this.loadBlockChainData();
   }
 
   async loadBlockChainData() {
     const ethereum = window.ethereum;
     const web3 = window.w3;
     const accounts = await ethereum.request({ method: 'eth_accounts' });
-    // const accounts = await web3.eth.getAccounts();
-    // web3.eth.defaultAccount = accounts[1];
     this.setState({
       account: accounts[0]
     });
     const ethBalance = await web3.eth.getBalance(this.state.account);
     console.log(ethBalance);
-    // this.setState({ ethBalance });
+    this.setState({ ethBalance });
   }
 
   async loadWeb3() {
+    let me = this;
     window.addEventListener('load', async () => {
       // Modern dapp browsers...
       if (window.ethereum) {
@@ -48,6 +46,7 @@ class App extends Component {
       else {
           console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
       }
+      await me.loadBlockChainData();
     });
   }
 
